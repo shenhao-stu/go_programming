@@ -6,6 +6,7 @@ import (
 )
 
 // recover() 函数用于捕获panic异常
+// defer() 先进后出
 func test() (err error) {
 	/* // defer+recover来捕获panic异常
 	defer func(){
