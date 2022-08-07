@@ -81,6 +81,7 @@ Go 使用了特殊的 rune 类型来处理 Unicode，让基于 Unicode 的文本
 `s.print!`
 `s.var!`
 `pkm`
+`tyi`
 
 ## go语言类型定义和类型别名的区别
 - 类型定义相当于定义了一个全新的类型，与之前的类型不同；但是类型别名并没有定义一个新的类型，而是使用一个别名来替换之前的类型
@@ -134,5 +135,572 @@ func main() {
 }
 
 // i: 100 i: int
+```
+
+## golang结构体作为函数参数
+go结构体可以像普通变量一样，作为函数的参数，传递给函数，这里分为两种情况：
+
+1. 直接传递结构体，这是一个副本（拷贝），在函数内部不会改变外面结构体内容 **值传递**
+2. 传递结构体指针，这时在函数内部，能够改变外部结构体内容 **指针传递**
+
+### 直接传递结构体
+```go
+package main
+ 
+import "fmt"
+ 
+type Person struct {
+    id   int
+    name string
+}
+ 
+func showPerson(person Person) {
+    person.id = 1
+    person.name = "kite"
+    fmt.Printf("person: %v\n", person)
+}
+ 
+func main() {
+    person := Person{1, "tom"}
+    fmt.Printf("person: %v\n", person)
+    fmt.Println("-------------------")
+    showPerson(person)
+    fmt.Println("-------------------")
+    fmt.Printf("person: %v\n", person)
+}
+```
+
+```
+person: {1 tom}
+-------------------
+person: {1 kite}
+-------------------
+person: {1 tom}
+```
+
+### 传递结构体指针
+
+```go
+package main
+ 
+import "fmt"
+ 
+type Person struct {
+    id   int
+    name string
+}
+ 
+func showPerson(person *Person) {
+    person.id = 1
+    person.name = "kite"
+    fmt.Printf("person: %v\n", *person)
+}
+ 
+func main() {
+    person := Person{1, "tom"}
+    fmt.Printf("person: %v\n", person)
+    fmt.Println("-------------------")
+    showPerson(&person)
+    fmt.Println("-------------------")
+    fmt.Printf("person: %v\n", person)
+}
+```
+
+```
+person: {1 tom}
+-------------------
+person: {1 kite}
+-------------------
+person: {1 kite}
+```
+
+## golang嵌套结构体
+
+go语言没有面向对象编程思想，也没有继承关系，但是可以通过结构体嵌套来实现这种效果。
+
+下面通过实例演示如何实现结构体嵌套，假如有一个人Person结构体，这个人还养了一个宠物Dog结构体
+
+```go
+import "fmt"
+ 
+type Dog struct {
+    name  string
+    color string
+    age   int
+}
+ 
+type person struct {
+    dog  Dog
+    name string
+    age  int
+}
+ 
+func main() {
+    var tom person
+    tom.dog.name = "花花"
+    tom.dog.color = "黑白花"
+    tom.dog.age = 2
+ 
+    tom.name = "tom"
+    tom.age = 20
+ 
+    fmt.Printf("tom: %v\n", tom)
+}
+
+// tom: {{花花 黑白花 2} tom 20}
+```
+
+## golang方法
+
+go语言没有面向对象的特性，也没有类对象的概念。但是，可以使用结构体来模拟这些特性，我们都知道面向对象里面有类方法等概念。我们也可以声明一些方法，属于某个结构体。
+
+### go语言方法的语法
+
+Go中的方法，是一种特殊的函数，定义于`struct`之上（与`struct`关联、绑定），被称为`struct`的接收者（`receiver`）。
+
+通俗的讲，方法就是有接收者的函数。
+
+```go
+type mytype struct{}
+ 
+func (recv mytype) my_method(para) retrun_type {}
+func (recv *mytype) my_method(para) return_type {}
+```
+
+`mytype`：定义一个结构体
+
+`recv`：接收该方法的结构体（receiver）
+
+`my_method`：方法名称
+
+`para`：参数列表
+
+`return_type`：返回值类型
+
+从语法格式可以看出，一个方法和一个函数非常相似，多了一个接收类型。
+
+```go
+package main
+ 
+import "fmt"
+ 
+type Person struct {
+    name string
+}
+
+type Customer struct{
+    name string
+}
+ 
+func (per Person) eat() {
+    fmt.Println(per.name + " eating....")
+}
+
+func (per Person) sleep() {
+    fmt.Println(per.name + " sleep....")
+}
+
+func (customer Customer) login(name string, pwd string) bool {
+    fmt.Printf("customer.name: %v\n", customer.name)
+    if name == "tom" && pwd == "123" {
+        return true
+    } else {
+        return false
+    }
+}
+ 
+func main() {
+    var per Person
+    per.name = "tom"
+    per.eat()
+    per.sleep()
+    
+    cus := Customer{"tom"}
+    b := cus.login("tom", "123")
+    fmt.Println(b)
+}
+
+// tom eating....
+// tom sleep....
+// customer.name: tom
+// true
+```
+
+### go语言方法的注意事项
+
+1. 方法的`receiver type`并非一定要是`struct`类型，`type`定义的类型别名、`slice`、`map`、`channel`、`func`类型等都可以。
+2. `struct`结合它的方法就等价于面向对象中的类。只不过`struct`可以和它的方法分开，并非一定要属于同一个文件，**但必须属于同一个包**。
+3. 方法有两种接收类型：`(T Type)`和`(T *Type)`，它们之间有区别。
+4. 方法就是函数，所以Go中没有方法重载（overload）的说法，也就是说同一个类型中的所有方法名必须都唯一。
+5. 如果`receiver`是一个指针类型，则会**自动解除引用**。
+6. 方法和`type`是分开的，意味着**实例的行为（behavior）和数据存储（field）是分开的**，但是它们通过receiver建立起关联关系。
+
+## golang方法接收者类型
+
+结构体实例，有值类型和指针类型，那么方法的接收者是结构体，那么也有值类型和指针类型。区别就是接收者是否复制结构体副本。值类型复制，指针类型不复制。
+
+### 值类型结构体和指针类型结构体
+
+```go
+package main
+ 
+import "fmt"
+ 
+type Person struct {
+    name string
+}
+ 
+func main() {
+    p1 := Person{name: "tom"}
+    fmt.Printf("p1: %T\n", p1)
+    p2 := &Person{name: "tom"}
+    fmt.Printf("p2: %T\n", p2)
+}
+
+// 从运行结果，我们可以看出p1是值类型，p2是指针类型。
+// p1: main.Person
+// p2: *main.Person
+```
+
+```go
+package main
+ 
+import "fmt"
+ 
+type Person struct {
+    name string
+}
+ 
+func showPerson(per Person) {
+    fmt.Printf("per: %p\n", &per)
+    per.name = "kite"
+    fmt.Printf("per: %v\n", per)
+}
+ 
+func showPerson2(per *Person) {
+    fmt.Printf("per: %p\n", per)
+    // per.name 自动解引用
+    per.name = "kite"
+    fmt.Printf("per: %v\n", per)
+}
+ 
+func main() {
+    p1 := Person{name: "tom"}
+    fmt.Printf("p1: %p\n", &p1)
+    showPerson(p1)
+    fmt.Printf("p1: %v\n", p1)
+    fmt.Println("---------------------")
+    p2 := &Person{name: "tom"}
+    fmt.Printf("p2: %p\n", p2)
+    showPerson2(p2)
+    fmt.Printf("p2: %v\n", p2)
+}
+
+/*
+从运行结果，我们看到p1是值传递，拷贝了副本，地址发生了改变，而p2是指针类型，地址没有改变。
+p1: 0xc000050230
+per: 0xc000050240
+per: {kite}
+p1: {tom}
+---------------------
+p2: 0xc000050270
+per: 0xc000050270
+per: &{kite}
+p2: &{kite}
+*/
+```
+
+### 方法的值类型和指针类型接收者
+
+值类型和指针类型接收者，本质上和函数传参道理相同。
+
+```go
+package main
+ 
+import "fmt"
+ 
+type Person struct {
+    name string
+}
+ 
+func (per Person) showPerson() {
+    fmt.Printf("per: %p\n", &per)
+    per.name = "kite"
+    fmt.Printf("per: %v\n", per)
+}
+ 
+func (per *Person) showPerson2() {
+    fmt.Printf("per: %p\n", per)
+    per.name = "kite"
+    fmt.Printf("per: %v\n", per)
+}
+ 
+func main() {
+    p1 := Person{name: "tom"}
+    fmt.Printf("p1: %p\n", &p1)
+    p1.showPerson()
+    fmt.Printf("p1: %v\n", p1)
+    fmt.Println("---------------------")
+    p2 := &Person{name: "tom"}
+    fmt.Printf("p2: %p\n", p2)
+    p2.showPerson2()
+    fmt.Printf("p2: %v\n", p2)
+}
+
+/*
+p1: 0xc000050230
+per: 0xc000050240
+per: {kite}
+p1: {tom}
+---------------------
+p2: 0xc000050270
+per: 0xc000050270
+per: &{kite}
+p2: &{kite}
+*/
+```
+
+## golang接口
+
+go语言的接口，是一种新的类型定义，它把所有的具有共性的方法定义在一起，任何其他类型只要实现了这些方法就是实现了这个接口。
+
+### 接口的语法格式
+
+```go
+/* 定义接口 */
+type interface_name interface {
+    method_name1 [return_type]
+    method_name2 [return_type]
+    method_name3 [return_type]
+    ...
+    method_namen [return_type]
+}
+ 
+/* 定义结构体 */
+type struct_name struct {
+    /* variables */
+}
+ 
+/* 实现接口方法 */
+func (struct_name_variable struct_name) method_name() [return_type] {
+    /* 方法实现 */
+}
+...
+/* 实现接口方法 */
+func (struct_name_variable struct_name) method_name() [return_type] {
+    /* 方法实现 */
+}
+```
+
+### 接口实例
+
+下面我定义一个USB接口，有读read和写write两个方法，再定义一个电脑Computer和一个手机Mobile来实现这个接口。
+
+**USB接口**
+
+```go
+type USB interface {
+    read()
+    write()
+}
+```
+
+**Computer结构体**
+
+```haskell
+type Computer struct {
+}
+```
+
+**Mobile结构体**
+
+```go
+type Mobile struct {
+}
+```
+
+**Computer实现USB接口方法**
+
+```go
+func (c Computer) read() {
+    fmt.Println("computer read...")
+}
+ 
+func (c Computer) write() {
+    fmt.Println("computer write...")
+}
+```
+
+**Mobile实现USB接口方法**
+
+```go
+func (c Mobile) read() {
+    fmt.Println("mobile read...")
+}
+ 
+func (c Mobile) write() {
+    fmt.Println("mobile write...")
+}
+```
+
+```go
+package main
+ 
+import "fmt"
+ 
+type USB interface {
+    read()
+    write()
+}
+ 
+type Computer struct {
+}
+ 
+type Mobile struct {
+}
+ 
+func (c Computer) read() {
+    fmt.Println("computer read...")
+}
+ 
+func (c Computer) write() {
+    fmt.Println("computer write...")
+}
+ 
+func (c Mobile) read() {
+    fmt.Println("mobile read...")
+}
+ 
+func (c Mobile) write() {
+    fmt.Println("mobile write...")
+}
+ 
+func main() {
+    c := Computer{}
+    m := Mobile{}
+ 
+    c.read()
+    c.write()
+    m.read()
+    m.write()
+    
+    /*
+    接口d
+    var usb USB
+    usb = Computer{}
+    usb.read()
+    usb.write()
+    */
+}
+
+/*
+computer read...
+computer write...
+mobile read...
+mobile write...
+*/
+```
+
+### 实现接口必须实现接口中的所有方法
+
+下面我们定义一个OpenClose接口，里面有两个方法open和close，定义个Door结构体，实现其中一个方法。
+
+```go
+package main
+ 
+import "fmt"
+ 
+type OpenClose interface {
+    open()
+    close()
+}
+ 
+type Door struct {
+}
+ 
+func (d Door) open() {
+    fmt.Println("open door...")
+}
+ 
+func main() {
+    var oc OpenClose
+    oc = Door{} // 这里编译错误，提示只实现了一个接口
+}
+```
+
+## golang接口值类型接收者和指针类型接收者
+
+这个话题，本质上和方法的值类型接收者和指针类型接收者的思考方法是一样的，值接收者是一个拷贝，是一个副本，而指针接收者，传递的是指针。
+
+```go
+package main
+ 
+import "fmt"
+ 
+type Pet interface {
+    eat()
+}
+ 
+type Dog struct {
+    name string
+}
+ 
+func (dog Dog) eat() {
+    fmt.Printf("dog: %p\n", &dog)
+    fmt.Println("dog eat...")
+    dog.name = "黑黑"
+}
+ 
+func main() {
+    dog := Dog{name: "花花"}
+    fmt.Printf("dog: %p\n", &dog)
+    dog.eat()
+    fmt.Printf("dog: %v\n", dog)
+}
+
+/*
+dog: 0xc000050230
+dog: 0xc000050240
+dog eat...
+dog: {花花}
+*/
+```
+
+从运行结果，我们看出dog的地址变了，说明是复制了一份，dog的name没有变说明外面的dog变量没有被改变。
+
+将Pet接口改为指针接收者
+
+```go
+package main
+ 
+import "fmt"
+ 
+type Pet interface {
+    eat()
+}
+ 
+type Dog struct {
+    name string
+}
+ 
+func (dog *Dog) eat() {
+    fmt.Printf("dog: %p\n", dog)
+    fmt.Println("dog eat...")
+    dog.name = "黑黑"
+}
+ 
+func main() {
+    dog := &Dog{name: "花花"}
+    fmt.Printf("dog: %p\n", dog)
+    dog.eat()
+    fmt.Printf("dog: %v\n", dog)
+}
+
+/*
+dog: 0xc000050230
+dog: 0xc000050230
+dog eat...
+dog: &{黑黑}
+*/
 ```
 
