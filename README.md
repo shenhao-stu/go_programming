@@ -704,3 +704,21 @@ dog: &{黑黑}
 */
 ```
 
+## Channel
+### channel的关闭
+
+使用内置函数close可以关闭channel，当channel关闭后，就不能再向channel写数据了，但是仍然可以从该channel读取数据
+
+### channel的遍历
+
+channel支持for-range的方式进行遍历，请注意两个细节
+
+- 在遍历时，如果channel没有关闭，则会出现deadlock的错误
+- 在遍历时，如果channel已经关闭，则会正常遍历数据，遍历完成后，就会退出遍历
+
+### channel的阻塞
+- 在没有使用协程的情况下，如果channel的长度小于写入数据的长度，那么会发生死锁的现象
+- 在使用协程的情况下，如果channel的长度小于写入数据的长度，那么会会阻塞，直到数据被读取，才会被唤醒
+- 如果关闭了协程，v,ok := <-chan，那么v为默认值，ok为false
+
+```go

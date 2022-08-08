@@ -11,12 +11,26 @@ var p *int
 // 函数的声明在外部
 func bar() {
 	//use p
-	fmt.Println(*p)
+	if p == nil {
+		fmt.Println("p is nil")
+	} else {
+		fmt.Println(*p)
+	}
 }
 
 func TestBar(t *testing.T) {
-	a := 1
-	p := &a
+	// a := 1
+	// p := &a
 	bar()
-	t.Log(*p)
+	// func() {
+	// 	//use p
+	// 	if p == nil {
+	// 		fmt.Println("p is nil")
+	// 	} else {
+	// 		fmt.Println(*p)
+	// 	}
+	// }()
+	if p != nil {
+		t.Log(*p)
+	}
 }
