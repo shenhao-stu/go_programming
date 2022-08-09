@@ -705,6 +705,21 @@ dog: &{黑黑}
 ```
 
 ## Channel
+
+### channel的特点
+
+- channel 本质就是一个数据结构-队列
+- channel 是**引用类型**
+- channel 必须初始化才能写入数据，即make后才能使用，且**只能存放指定的数据类型，除非使用空接口**
+    - intChan := make(chan int, capacity)
+
+### channel 死锁和阻塞tips
+
+- channel的数据放满后，就不能放入了，如果继续放入，会导致死锁
+- 如果从channel取出数据，可以继续放入
+- 在没有使用协程的情况下，如果我们的管道数据已经全部去除，再取就会报告 **deadlock** (不要用testing框架测试，会变成**runtime超时**)
+- 在使用协程的情况下，如果我们的管道数据已经全部去除，再取就会**阻塞**
+
 ### channel的关闭
 
 使用内置函数close可以关闭channel，当channel关闭后，就不能再向channel写数据了，但是仍然可以从该channel读取数据
@@ -718,7 +733,189 @@ channel支持for-range的方式进行遍历，请注意两个细节
 
 ### channel的阻塞
 - 在没有使用协程的情况下，如果channel的长度小于写入数据的长度，那么会发生死锁的现象
-- 在使用协程的情况下，如果channel的长度小于写入数据的长度，那么会会阻塞，直到数据被读取，才会被唤醒
+- 在使用协程的情况下，如果channel的长度小于写入数据的长度，那么会阻塞，直到数据被读取，才会被唤醒
 - 如果关闭了协程，v,ok := <-chan，那么v为默认值，ok为false
 
+### channel使用细节和注意事项
+
+#### 1.channel可以声明为只读或者只写性质
+
 ```go
+package main
+
+import "fmt"
+
+func main() {
+	// 管道可以声明为只读或者只写
+
+	// 1. 在默认情况下，管道是双向的
+	var chan1 chan int // 可读可写
+	chan1 <- 20
+	fmt.Printf("<-chan1: %v\n", (<-chan1))
+
+	// 2. 声明为只写
+	var chan2 chan<- int = make(chan int, 2)
+	chan2 <- 20
+	// 打印chan2的内容，其为一个地址，指向一个队列空间
+	fmt.Printf("chan2: %v\n", chan2)
+
+	// 3. 声明为只读
+	var chan3 <-chan int
+	<-chan3
+
+}
+
+```
+
+应用案例
+
+```go
+package main
+
+import "fmt"
+
+// 形参指定模式
+// ch chan<- int, only write
+func send(ch chan<- int, exitChan chan struct{}) {
+	for i := 0; i < 10; i++ {
+		ch <- i
+	}
+	close(ch)
+	var a struct{}
+	exitChan <- a
+}
+
+// ch <-chan int, only read
+func recv(ch <-chan int, exitChan chan struct{}) {
+	for {
+		v, ok := <-ch
+		if !ok {
+			break
+		}
+		fmt.Printf("v: %v\n", v)
+	}
+	var a struct{}
+	exitChan <- a
+}
+
+func main() {
+	var ch = make(chan int, 10)
+	exitChan := make(chan struct{}, 2)
+	go send(ch, exitChan)
+	go recv(ch, exitChan)
+
+	var total = 0
+	for _ = range exitChan {
+		total++
+		if total == 2 {
+			break
+		}
+	}
+	fmt.Println("ending......")
+
+}
+```
+
+#### 2.使用`select`可以解决阻塞问题以及实现超时控制
+
+2.1 使用`select`可以解决从管道取数据的阻塞问题（不需要关闭通道，解决阻塞)
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	// 使用select可以解决从管道取数据的阻塞问题
+
+	intChan := make(chan int, 10)
+
+	for i := 0; i < 10; i++ {
+		intChan <- i
+
+	}
+
+	strChan := make(chan string, 5)
+	for i := 0; i < 5; i++ {
+		strChan <- "hello" + fmt.Sprintf("%d", i)
+	}
+
+	// 传统方法在遍历管道时，如果不关闭会阻塞而导致deadlock
+	// 问题 在实际开发中，我们可能不好确定什么时候关闭该管道
+	// 可以使用select方式解决
+	label:
+	for {
+		select {
+		// 如果intChan一直没有关闭，不会一直阻塞而导致deadlock
+		// 会自动到下一个case匹配
+		case v := <-intChan:
+			fmt.Printf("read intdata: %v\n", v)
+		case v := <-strChan:
+			fmt.Printf("read strdata: %v\n", v)
+		default:
+			fmt.Println("no data")
+			break label
+		}
+	}
+}
+```
+
+2.2 使用`select`实现超时控制
+
+```go
+select {
+case ret := <-retCh:
+  t.Logf("result %s", ret)
+case <-time.After(time.Second * 1)
+  t.Error("time out")
+}
+```
+
+#### 3.goroutine中使用`recover`，解决协程中出现`panic`，导致程序崩溃问题
+
+```go
+// 在goroutine中使用recover来捕获panic，进行处理，这样即使这个协程发生了问题，不会影响其他协程继续执行
+defer func(){
+    if err := recover(); err != nil {
+        fmt.Printf("err: %v\n", err)
+    }
+}()
+```
+
+
+
+### 使用WaitGroup进行协程的同步
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	var lock sync.Mutex
+	var wg sync.WaitGroup
+	count := 0
+
+	for i := 0; i < 5000; i++ {
+    // add one goroutine task
+		wg.Add(1)
+		go func() {
+			lock.Lock()
+			count++
+			lock.Unlock()
+      // end a goroutine task
+			wg.Done()
+		}()
+	}
+	
+    // sync all tasks
+	wg.Wait()
+	fmt.Println(count)
+}
+
+```
+
+### 
