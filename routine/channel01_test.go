@@ -6,9 +6,9 @@ channel 是引用类型 important
 channel 必须初始化才能写入数据，即make后才能使用
 intChan := make(chan int, capacity)
 channel 只能存放指定的数据类型
-channel 的数据放满后，就不能放入了
-如果从channel取出数据，可以继续放入
-在没有使用协程的情况下，如果我们的管道数据已经全部去除，再取就会报告 deadlock
+在没有使用协程的情况下，channel 的数据放满后，就不能放入了，如果继续放入，会导致死锁，如果从channel取出数据，可以继续放入
+在没有使用协程的情况下，如果我们的管道数据已经全部去除，再取就会报告 deadlock(不要用testing框架测试)
+在使用协程的情况下，如果我们的管道数据已经全部去除，再取就会阻塞
 */
 
 /*
