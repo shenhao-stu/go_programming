@@ -1,15 +1,16 @@
-# Go语言自学系列
+# Go 语言自学系列
 
 [TOC]
 
-## byte和rune类型
+## byte 和 rune 类型
+
 组成每个字符串的元素叫做“字符”，可以通过遍历或者单个获取字符串元素获得字符。 字符用单引号（'）包裹起来，如：
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 func main() {
     var a = '华'
     var b = 'a'
@@ -27,47 +28,48 @@ b: 97,a
 
 Go 语言的字符有以下两种：
 
-- uint8类型，或者叫 byte 型，代表了ASCII码的一个字符。
-    - byte 类似 uint8
-- rune类型，代表一个 UTF-8字符。
-    - rune 类似 int32
-    - 当需要处理中文、日文或者其他复合字符时，则需要用到rune类型。rune类型实际是一个int32。
+- uint8 类型，或者叫 byte 型，代表了 ASCII 码的一个字符。
+  - byte 类似 uint8
+- rune 类型，代表一个 UTF-8 字符。
+  - rune 类似 int32
+  - 当需要处理中文、日文或者其他复合字符时，则需要用到 rune 类型。rune 类型实际是一个 int32。
 
 Go 使用了特殊的 rune 类型来处理 Unicode，让基于 Unicode 的文本处理更为方便，也可以使用 byte 型进行默认字符串处理，性能和扩展性都有照顾。
 
 ## 占位符
+
 ### 整数占位符
 
-| 占位符 |                    说明                    |         举例         |  输出  |
-| :----: | :----------------------------------------: | :------------------: | :----: |
-|   %b   |                 二进制表示                 |   Printf("%b", 5)    |  101   |
-|   %c   |        相应Unicode码点所表示的字符         | Printf("%c", 0x4E2D) |   中   |
-|   %d   |                 十进制表示                 |  Printf("%d", 0x12)  |   18   |
-|   %o   |                 八进制表示                 |   Printf("%o", 10)   |   12   |
-|   %q   | 单引号围绕的字符字面值，由Go语法安全地转义 | Printf("%q", 0x4E2D) |  '中'  |
-|   %x   |      十六进制表示，字母形式为小写 a-f      |   Printf("%x", 13)   |   d    |
-|   %X   |      十六进制表示，字母形式为大写 A-F      |   Printf("%x", 13)   |   D    |
-|   %U   |    Unicode格式：U+1234，等同于 "U+%04X"    | Printf("%U", 0x4E2D) | U+4E2D |
+| 占位符 |                     说明                     |         举例         |  输出  |
+| :----: | :------------------------------------------: | :------------------: | :----: |
+|   %b   |                  二进制表示                  |   Printf("%b", 5)    |  101   |
+|   %c   |        相应 Unicode 码点所表示的字符         | Printf("%c", 0x4E2D) |   中   |
+|   %d   |                  十进制表示                  |  Printf("%d", 0x12)  |   18   |
+|   %o   |                  八进制表示                  |   Printf("%o", 10)   |   12   |
+|   %q   | 单引号围绕的字符字面值，由 Go 语法安全地转义 | Printf("%q", 0x4E2D) |  '中'  |
+|   %x   |       十六进制表示，字母形式为小写 a-f       |   Printf("%x", 13)   |   d    |
+|   %X   |       十六进制表示，字母形式为大写 A-F       |   Printf("%x", 13)   |   D    |
+|   %U   |    Unicode 格式：U+1234，等同于 "U+%04X"     | Printf("%U", 0x4E2D) | U+4E2D |
 
 ### 浮点数和复数的组成部分（实部和虚部）
 
-| 占位符 |                             说明                             |          举例          |     输出     |
-| :----: | :----------------------------------------------------------: | :--------------------: | :----------: |
+| 占位符 |                                                 说明                                                 |          举例          |     输出     |
+| :----: | :--------------------------------------------------------------------------------------------------: | :--------------------: | :----------: |
 |   %b   | 无小数部分的，指数为二的幂的科学计数法，与 strconv.FormatFloat 的 'b' 转换格式一致。例如 -123456p-78 |                        |              |
-|   %e   |                科学计数法，例如 -1234.456e+78                |   Printf("%e", 10.2)   | 1.020000e+01 |
-|   %E   |                科学计数法，例如 -1234.456E+78                |   Printf("%e", 10.2)   | 1.020000E+01 |
-|   %f   |                有小数点而无指数，例如 123.456                |   Printf("%f", 10.2)   |  10.200000   |
-|   %g   |    根据情况选择 %e 或 %f 以产生更紧凑的（无末尾的0）输出     |  Printf("%g", 10.20)   |     10.2     |
-|   %G   |    根据情况选择 %E 或 %f 以产生更紧凑的（无末尾的0）输出     | Printf("%G", 10.20+2i) |  (10.2+2i)   |
+|   %e   |                                    科学计数法，例如 -1234.456e+78                                    |   Printf("%e", 10.2)   | 1.020000e+01 |
+|   %E   |                                    科学计数法，例如 -1234.456E+78                                    |   Printf("%e", 10.2)   | 1.020000E+01 |
+|   %f   |                                    有小数点而无指数，例如 123.456                                    |   Printf("%f", 10.2)   |  10.200000   |
+|   %g   |                        根据情况选择 %e 或 %f 以产生更紧凑的（无末尾的 0）输出                        |  Printf("%g", 10.20)   |     10.2     |
+|   %G   |                        根据情况选择 %E 或 %f 以产生更紧凑的（无末尾的 0）输出                        | Printf("%G", 10.20+2i) |  (10.2+2i)   |
 
 ### 字符串与字节切片
 
-| 占位符 |                  说明                  |              举例              |     输出     |
-| :----: | :------------------------------------: | :----------------------------: | :----------: |
-|   %s   |  输出字符串表示（string类型或[]byte)   | Printf("%s", []byte("多课网")) |    多课网    |
-|   %q   | 双引号围绕的字符串，由Go语法安全地转义 |     Printf("%q", "多课网")     |   "多课网"   |
-|   %x   |   十六进制，小写字母，每字节两个字符   |     Printf("%x", "golang")     | 676f6c616e67 |
-|   %X   |   十六进制，大写字母，每字节两个字符   |     Printf("%X", "golang")     | 676F6C616E67 |
+| 占位符 |                   说明                   |              举例              |     输出     |
+| :----: | :--------------------------------------: | :----------------------------: | :----------: |
+|   %s   |   输出字符串表示（string 类型或[]byte)   | Printf("%s", []byte("多课网")) |    多课网    |
+|   %q   | 双引号围绕的字符串，由 Go 语法安全地转义 |     Printf("%q", "多课网")     |   "多课网"   |
+|   %x   |    十六进制，小写字母，每字节两个字符    |     Printf("%x", "golang")     | 676f6c616e67 |
+|   %X   |    十六进制，大写字母，每字节两个字符    |     Printf("%X", "golang")     | 676F6C616E67 |
 
 ### 指针
 
@@ -76,6 +78,7 @@ Go 使用了特殊的 rune 类型来处理 Unicode，让基于 Unicode 的文本
 |   %p   | 十六进制表示，前缀 0x | Printf("%p", &site) | 0x4f57f0 |
 
 ## 快捷键
+
 `fint`
 `ff`
 `fp`
@@ -85,12 +88,14 @@ Go 使用了特殊的 rune 类型来处理 Unicode，让基于 Unicode 的文本
 `pkm`
 `tyi`
 
-## go语言类型定义和类型别名的区别
+## go 语言类型定义和类型别名的区别
+
 - 类型定义相当于定义了一个全新的类型，与之前的类型不同；但是类型别名并没有定义一个新的类型，而是使用一个别名来替换之前的类型
 - 类型别名只会在代码中存在，在编译完成之后并不会存在该别名
 - 因为类型别名和原来的类型是一致的，所以原来类型所拥有的方法，类型别名中也可以调用，但是如果是重新定义的一个类型，那么不可以调用之前的任何方法
 
-### go语言类型定义
+### go 语言类型定义
+
 类型定义的语法
 
 ```python
@@ -99,9 +104,9 @@ type NewType Type
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 func main() {
     // 类型定义
     type MyInt int
@@ -114,7 +119,7 @@ func main() {
 // i: 100 i: main.MyInt
 ```
 
-### go语言类型别名
+### go 语言类型别名
 
 类型别名的语法
 
@@ -124,9 +129,9 @@ type NewType = Type
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 func main() {
     // 类型别名定义
     type MyInt2 = int
@@ -141,30 +146,31 @@ func main() {
 
 ## Struct
 
-### golang结构体作为函数参数
+### golang 结构体作为函数参数
 
-go结构体可以像普通变量一样，作为函数的参数，传递给函数，这里分为两种情况：
+go 结构体可以像普通变量一样，作为函数的参数，传递给函数，这里分为两种情况：
 
 1. 直接传递结构体，这是一个副本（拷贝），在函数内部不会改变外面结构体内容 **值传递**
 2. 传递结构体指针，这时在函数内部，能够改变外部结构体内容 **指针传递**
 
 #### 直接传递结构体
+
 ```go
 package main
- 
+
 import "fmt"
- 
+
 type Person struct {
     id   int
     name string
 }
- 
+
 func showPerson(person Person) {
     person.id = 1
     person.name = "kite"
     fmt.Printf("person: %v\n", person)
 }
- 
+
 func main() {
     person := Person{1, "tom"}
     fmt.Printf("person: %v\n", person)
@@ -187,20 +193,20 @@ person: {1 tom}
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 type Person struct {
     id   int
     name string
 }
- 
+
 func showPerson(person *Person) {
     person.id = 1
     person.name = "kite"
     fmt.Printf("person: %v\n", *person)
 }
- 
+
 func main() {
     person := Person{1, "tom"}
     fmt.Printf("person: %v\n", person)
@@ -219,55 +225,55 @@ person: {1 kite}
 person: {1 kite}
 ```
 
-### golang嵌套结构体
+### golang 嵌套结构体
 
-go语言没有面向对象编程思想，也没有继承关系，但是可以通过结构体嵌套来实现这种效果。
+go 语言没有面向对象编程思想，也没有继承关系，但是可以通过结构体嵌套来实现这种效果。
 
-下面通过实例演示如何实现结构体嵌套，假如有一个人Person结构体，这个人还养了一个宠物Dog结构体
+下面通过实例演示如何实现结构体嵌套，假如有一个人 Person 结构体，这个人还养了一个宠物 Dog 结构体
 
 ```go
 import "fmt"
- 
+
 type Dog struct {
     name  string
     color string
     age   int
 }
- 
+
 type person struct {
     dog  Dog
     name string
     age  int
 }
- 
+
 func main() {
     var tom person
     tom.dog.name = "花花"
     tom.dog.color = "黑白花"
     tom.dog.age = 2
- 
+
     tom.name = "tom"
     tom.age = 20
- 
+
     fmt.Printf("tom: %v\n", tom)
 }
 
 // tom: {{花花 黑白花 2} tom 20}
 ```
 
-### golang方法
+### golang 方法
 
-go语言没有面向对象的特性，也没有类对象的概念。但是，可以使用结构体来模拟这些特性，我们都知道面向对象里面有类方法等概念。我们也可以声明一些方法，属于某个结构体。
+go 语言没有面向对象的特性，也没有类对象的概念。但是，可以使用结构体来模拟这些特性，我们都知道面向对象里面有类方法等概念。我们也可以声明一些方法，属于某个结构体。
 
-#### go语言方法的语法
+#### go 语言方法的语法
 
-Go中的方法，是一种特殊的函数，定义于`struct`之上（与`struct`关联、绑定），被称为`struct`的接收者（`receiver`）。
+Go 中的方法，是一种特殊的函数，定义于`struct`之上（与`struct`关联、绑定），被称为`struct`的接收者（`receiver`）。
 
 通俗的讲，方法就是有接收者的函数。
 
 ```go
 type mytype struct{}
- 
+
 func (recv mytype) my_method(para) retrun_type {}
 func (recv *mytype) my_method(para) return_type {}
 ```
@@ -286,9 +292,9 @@ func (recv *mytype) my_method(para) return_type {}
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 type Person struct {
     name string
 }
@@ -296,7 +302,7 @@ type Person struct {
 type Customer struct{
     name string
 }
- 
+
 func (per Person) eat() {
     fmt.Println(per.name + " eating....")
 }
@@ -313,13 +319,13 @@ func (customer Customer) login(name string, pwd string) bool {
         return false
     }
 }
- 
+
 func main() {
     var per Person
     per.name = "tom"
     per.eat()
     per.sleep()
-    
+
     cus := Customer{"tom"}
     b := cus.login("tom", "123")
     fmt.Println(b)
@@ -331,16 +337,16 @@ func main() {
 // true
 ```
 
-#### go语言方法的注意事项
+#### go 语言方法的注意事项
 
 1. 方法的`receiver type`并非一定要是`struct`类型，`type`定义的类型别名、`slice`、`map`、`channel`、`func`类型等都可以。
 2. `struct`结合它的方法就等价于面向对象中的类。只不过`struct`可以和它的方法分开，并非一定要属于同一个文件，**但必须属于同一个包**。
 3. 方法有两种接收类型：`(T Type)`和`(T *Type)`，它们之间有区别。
-4. 方法就是函数，所以Go中没有方法重载（overload）的说法，也就是说同一个类型中的所有方法名必须都唯一。
+4. 方法就是函数，所以 Go 中没有方法重载（overload）的说法，也就是说同一个类型中的所有方法名必须都唯一。
 5. 如果`receiver`是一个指针类型，则会**自动解除引用**。
-6. 方法和`type`是分开的，意味着**实例的行为（behavior）和数据存储（field）是分开的**，但是它们通过receiver建立起关联关系。
+6. 方法和`type`是分开的，意味着**实例的行为（behavior）和数据存储（field）是分开的**，但是它们通过 receiver 建立起关联关系。
 
-### golang方法接收者类型
+### golang 方法接收者类型
 
 结构体实例，有值类型和指针类型，那么方法的接收者是结构体，那么也有值类型和指针类型。区别就是接收者是否复制结构体副本。值类型复制，指针类型不复制。
 
@@ -348,13 +354,13 @@ func main() {
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 type Person struct {
     name string
 }
- 
+
 func main() {
     p1 := Person{name: "tom"}
     fmt.Printf("p1: %T\n", p1)
@@ -369,26 +375,26 @@ func main() {
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 type Person struct {
     name string
 }
- 
+
 func showPerson(per Person) {
     fmt.Printf("per: %p\n", &per)
     per.name = "kite"
     fmt.Printf("per: %v\n", per)
 }
- 
+
 func showPerson2(per *Person) {
     fmt.Printf("per: %p\n", per)
     // per.name 自动解引用
     per.name = "kite"
     fmt.Printf("per: %v\n", per)
 }
- 
+
 func main() {
     p1 := Person{name: "tom"}
     fmt.Printf("p1: %p\n", &p1)
@@ -421,25 +427,25 @@ p2: &{kite}
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 type Person struct {
     name string
 }
- 
+
 func (per Person) showPerson() {
     fmt.Printf("per: %p\n", &per)
     per.name = "kite"
     fmt.Printf("per: %v\n", per)
 }
- 
+
 func (per *Person) showPerson2() {
     fmt.Printf("per: %p\n", per)
     per.name = "kite"
     fmt.Printf("per: %v\n", per)
 }
- 
+
 func main() {
     p1 := Person{name: "tom"}
     fmt.Printf("p1: %p\n", &p1)
@@ -465,9 +471,9 @@ p2: &{kite}
 */
 ```
 
-### golang接口
+### golang 接口
 
-go语言的接口，是一种新的类型定义，它把所有的具有共性的方法定义在一起，任何其他类型只要实现了这些方法就是实现了这个接口。
+go 语言的接口，是一种新的类型定义，它把所有的具有共性的方法定义在一起，任何其他类型只要实现了这些方法就是实现了这个接口。
 
 #### 接口的语法格式
 
@@ -480,12 +486,12 @@ type interface_name interface {
     ...
     method_namen [return_type]
 }
- 
+
 /* 定义结构体 */
 type struct_name struct {
     /* variables */
 }
- 
+
 /* 实现接口方法 */
 func (struct_name_variable struct_name) method_name() [return_type] {
     /* 方法实现 */
@@ -499,9 +505,9 @@ func (struct_name_variable struct_name) method_name() [return_type] {
 
 #### 接口实例
 
-下面我定义一个USB接口，有读read和写write两个方法，再定义一个电脑Computer和一个手机Mobile来实现这个接口。
+下面我定义一个 USB 接口，有读 read 和写 write 两个方法，再定义一个电脑 Computer 和一个手机 Mobile 来实现这个接口。
 
-**USB接口**
+**USB 接口**
 
 ```go
 type USB interface {
@@ -510,39 +516,39 @@ type USB interface {
 }
 ```
 
-**Computer结构体**
+**Computer 结构体**
 
 ```haskell
 type Computer struct {
 }
 ```
 
-**Mobile结构体**
+**Mobile 结构体**
 
 ```go
 type Mobile struct {
 }
 ```
 
-**Computer实现USB接口方法**
+**Computer 实现 USB 接口方法**
 
 ```go
 func (c Computer) read() {
     fmt.Println("computer read...")
 }
- 
+
 func (c Computer) write() {
     fmt.Println("computer write...")
 }
 ```
 
-**Mobile实现USB接口方法**
+**Mobile 实现 USB 接口方法**
 
 ```go
 func (c Mobile) read() {
     fmt.Println("mobile read...")
 }
- 
+
 func (c Mobile) write() {
     fmt.Println("mobile write...")
 }
@@ -550,45 +556,45 @@ func (c Mobile) write() {
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 type USB interface {
     read()
     write()
 }
- 
+
 type Computer struct {
 }
- 
+
 type Mobile struct {
 }
- 
+
 func (c Computer) read() {
     fmt.Println("computer read...")
 }
- 
+
 func (c Computer) write() {
     fmt.Println("computer write...")
 }
- 
+
 func (c Mobile) read() {
     fmt.Println("mobile read...")
 }
- 
+
 func (c Mobile) write() {
     fmt.Println("mobile write...")
 }
- 
+
 func main() {
     c := Computer{}
     m := Mobile{}
- 
+
     c.read()
     c.write()
     m.read()
     m.write()
-    
+
     /*
     接口d
     var usb USB
@@ -608,32 +614,32 @@ mobile write...
 
 #### 实现接口必须实现接口中的所有方法
 
-下面我们定义一个OpenClose接口，里面有两个方法open和close，定义个Door结构体，实现其中一个方法。
+下面我们定义一个 OpenClose 接口，里面有两个方法 open 和 close，定义个 Door 结构体，实现其中一个方法。
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 type OpenClose interface {
     open()
     close()
 }
- 
+
 type Door struct {
 }
- 
+
 func (d Door) open() {
     fmt.Println("open door...")
 }
- 
+
 func main() {
     var oc OpenClose
     oc = Door{} // 这里编译错误，提示只实现了一个接口
 }
 ```
 
-### golang接口接收者类型
+### golang 接口接收者类型
 
 #### 值类型接收者
 
@@ -641,23 +647,23 @@ func main() {
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 type Pet interface {
     eat()
 }
- 
+
 type Dog struct {
     name string
 }
- 
+
 func (dog Dog) eat() {
     fmt.Printf("dog: %p\n", &dog)
     fmt.Println("dog eat...")
     dog.name = "黑黑"
 }
- 
+
 func main() {
     dog := Dog{name: "花花"}
     fmt.Printf("dog: %p\n", &dog)
@@ -673,31 +679,31 @@ dog: {花花}
 */
 ```
 
-从运行结果，我们看出dog的地址变了，说明是复制了一份，dog的name没有变说明外面的dog变量没有被改变。
+从运行结果，我们看出 dog 的地址变了，说明是复制了一份，dog 的 name 没有变说明外面的 dog 变量没有被改变。
 
 #### 指针类型接收者
 
-将Pet接口改为指针接收者
+将 Pet 接口改为指针接收者
 
 ```go
 package main
- 
+
 import "fmt"
- 
+
 type Pet interface {
     eat()
 }
- 
+
 type Dog struct {
     name string
 }
- 
+
 func (dog *Dog) eat() {
     fmt.Printf("dog: %p\n", dog)
     fmt.Println("dog eat...")
     dog.name = "黑黑"
 }
- 
+
 func main() {
     dog := &Dog{name: "花花"}
     fmt.Printf("dog: %p\n", dog)
@@ -715,39 +721,40 @@ dog: &{黑黑}
 
 ## Channel
 
-### channel的特点
+### channel 的特点
 
 - channel 本质就是一个数据结构-队列
 - channel 是**引用类型**
-- channel 必须初始化才能写入数据，即make后才能使用，且**只能存放指定的数据类型，除非使用空接口**
-    - intChan := make(chan int, capacity)
+- channel 必须初始化才能写入数据，即 make 后才能使用，且**只能存放指定的数据类型，除非使用空接口**
+  - intChan := make(chan int, capacity)
 
-### channel 死锁和阻塞tips
+### channel 死锁和阻塞 tips
 
-- channel的数据放满后，就不能放入了，如果继续放入，会导致死锁
-- 如果从channel取出数据，可以继续放入
-- 在没有使用协程的情况下，如果我们的管道数据已经全部去除，再取就会报告 **deadlock** (不要用testing框架测试，会变成**runtime超时**)
+- channel 的数据放满后，就不能放入了，如果继续放入，会导致死锁
+- 如果从 channel 取出数据，可以继续放入
+- 在没有使用协程的情况下，如果我们的管道数据已经全部去除，再取就会报告 **deadlock** (不要用 testing 框架测试，会变成**runtime 超时**)
 - 在使用协程的情况下，如果我们的管道数据已经全部去除，再取就会**阻塞**
 
-### channel的关闭
+### channel 的关闭
 
-使用内置函数close可以关闭channel，当channel关闭后，就不能再向channel写数据了，但是仍然可以从该channel读取数据
+使用内置函数 close 可以关闭 channel，当 channel 关闭后，就不能再向 channel 写数据了，但是仍然可以从该 channel 读取数据
 
-### channel的遍历
+### channel 的遍历
 
-channel支持for-range的方式进行遍历，请注意两个细节
+channel 支持 for-range 的方式进行遍历，请注意两个细节
 
-- 在遍历时，如果channel没有关闭，则会出现deadlock的错误
-- 在遍历时，如果channel已经关闭，则会正常遍历数据，遍历完成后，就会退出遍历
+- 在遍历时，如果 channel 没有关闭，则会出现 deadlock 的错误
+- 在遍历时，如果 channel 已经关闭，则会正常遍历数据，遍历完成后，就会退出遍历
 
-### channel的阻塞
-- 在没有使用协程的情况下，如果channel的长度小于写入数据的长度，那么会发生死锁的现象
-- 在使用协程的情况下，如果channel的长度小于写入数据的长度，那么会阻塞，直到数据被读取，才会被唤醒
-- 如果关闭了协程，v,ok := <-chan，那么v为默认值，ok为false
+### channel 的阻塞
 
-### channel使用细节和注意事项
+- 在没有使用协程的情况下，如果 channel 的长度小于写入数据的长度，那么会发生死锁的现象
+- 在使用协程的情况下，如果 channel 的长度小于写入数据的长度，那么会阻塞，直到数据被读取，才会被唤醒
+- 如果关闭了协程，v,ok := <-chan，那么 v 为默认值，ok 为 false
 
-#### 1.channel可以声明为只读或者只写性质
+### channel 使用细节和注意事项
+
+#### 1.channel 可以声明为只读或者只写性质
 
 ```go
 package main
@@ -880,7 +887,7 @@ case <-time.After(time.Second * 1)
 }
 ```
 
-#### 3.goroutine中使用`recover`，解决协程中出现`panic`，导致程序崩溃问题
+#### 3.goroutine 中使用`recover`，解决协程中出现`panic`，导致程序崩溃问题
 
 ```go
 // 在goroutine中使用recover来捕获panic，进行处理，这样即使这个协程发生了问题，不会影响其他协程继续执行
@@ -891,9 +898,7 @@ defer func(){
 }()
 ```
 
-
-
-### 使用WaitGroup进行协程的同步
+### 使用 WaitGroup 进行协程的同步
 
 ```go
 package main
@@ -919,7 +924,7 @@ func main() {
 			wg.Done()
 		}()
 	}
-	
+
     // sync all tasks
 	wg.Wait()
 	fmt.Println(count)
@@ -929,7 +934,7 @@ func main() {
 
 ## flag
 
-可以用flag包对命令行参数进行解析
+可以用 flag 包对命令行参数进行解析
 
 ```go
 package main
@@ -963,6 +968,3 @@ func main() {
 	fmt.Printf("user=%v pwd=%v host=%v port=%v\n", user, pwd, host, port)
 }
 ```
-
-
-
