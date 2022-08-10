@@ -1,5 +1,7 @@
 # Go语言自学系列
 
+[TOC]
+
 ## byte和rune类型
 组成每个字符串的元素叫做“字符”，可以通过遍历或者单个获取字符串元素获得字符。 字符用单引号（'）包裹起来，如：
 
@@ -137,13 +139,16 @@ func main() {
 // i: 100 i: int
 ```
 
-## golang结构体作为函数参数
+## Struct
+
+### golang结构体作为函数参数
+
 go结构体可以像普通变量一样，作为函数的参数，传递给函数，这里分为两种情况：
 
 1. 直接传递结构体，这是一个副本（拷贝），在函数内部不会改变外面结构体内容 **值传递**
 2. 传递结构体指针，这时在函数内部，能够改变外部结构体内容 **指针传递**
 
-### 直接传递结构体
+#### 直接传递结构体
 ```go
 package main
  
@@ -178,7 +183,7 @@ person: {1 kite}
 person: {1 tom}
 ```
 
-### 传递结构体指针
+#### 传递结构体指针
 
 ```go
 package main
@@ -214,7 +219,7 @@ person: {1 kite}
 person: {1 kite}
 ```
 
-## golang嵌套结构体
+### golang嵌套结构体
 
 go语言没有面向对象编程思想，也没有继承关系，但是可以通过结构体嵌套来实现这种效果。
 
@@ -250,11 +255,11 @@ func main() {
 // tom: {{花花 黑白花 2} tom 20}
 ```
 
-## golang方法
+### golang方法
 
 go语言没有面向对象的特性，也没有类对象的概念。但是，可以使用结构体来模拟这些特性，我们都知道面向对象里面有类方法等概念。我们也可以声明一些方法，属于某个结构体。
 
-### go语言方法的语法
+#### go语言方法的语法
 
 Go中的方法，是一种特殊的函数，定义于`struct`之上（与`struct`关联、绑定），被称为`struct`的接收者（`receiver`）。
 
@@ -326,7 +331,7 @@ func main() {
 // true
 ```
 
-### go语言方法的注意事项
+#### go语言方法的注意事项
 
 1. 方法的`receiver type`并非一定要是`struct`类型，`type`定义的类型别名、`slice`、`map`、`channel`、`func`类型等都可以。
 2. `struct`结合它的方法就等价于面向对象中的类。只不过`struct`可以和它的方法分开，并非一定要属于同一个文件，**但必须属于同一个包**。
@@ -335,11 +340,11 @@ func main() {
 5. 如果`receiver`是一个指针类型，则会**自动解除引用**。
 6. 方法和`type`是分开的，意味着**实例的行为（behavior）和数据存储（field）是分开的**，但是它们通过receiver建立起关联关系。
 
-## golang方法接收者类型
+### golang方法接收者类型
 
 结构体实例，有值类型和指针类型，那么方法的接收者是结构体，那么也有值类型和指针类型。区别就是接收者是否复制结构体副本。值类型复制，指针类型不复制。
 
-### 值类型结构体和指针类型结构体
+#### 值类型结构体和指针类型结构体
 
 ```go
 package main
@@ -410,7 +415,7 @@ p2: &{kite}
 */
 ```
 
-### 方法的值类型和指针类型接收者
+#### 方法的值类型和指针类型接收者
 
 值类型和指针类型接收者，本质上和函数传参道理相同。
 
@@ -460,11 +465,11 @@ p2: &{kite}
 */
 ```
 
-## golang接口
+### golang接口
 
 go语言的接口，是一种新的类型定义，它把所有的具有共性的方法定义在一起，任何其他类型只要实现了这些方法就是实现了这个接口。
 
-### 接口的语法格式
+#### 接口的语法格式
 
 ```go
 /* 定义接口 */
@@ -492,7 +497,7 @@ func (struct_name_variable struct_name) method_name() [return_type] {
 }
 ```
 
-### 接口实例
+#### 接口实例
 
 下面我定义一个USB接口，有读read和写write两个方法，再定义一个电脑Computer和一个手机Mobile来实现这个接口。
 
@@ -601,7 +606,7 @@ mobile write...
 */
 ```
 
-### 实现接口必须实现接口中的所有方法
+#### 实现接口必须实现接口中的所有方法
 
 下面我们定义一个OpenClose接口，里面有两个方法open和close，定义个Door结构体，实现其中一个方法。
 
@@ -628,7 +633,9 @@ func main() {
 }
 ```
 
-## golang接口值类型接收者和指针类型接收者
+### golang接口接收者类型
+
+#### 值类型接收者
 
 这个话题，本质上和方法的值类型接收者和指针类型接收者的思考方法是一样的，值接收者是一个拷贝，是一个副本，而指针接收者，传递的是指针。
 
@@ -667,6 +674,8 @@ dog: {花花}
 ```
 
 从运行结果，我们看出dog的地址变了，说明是复制了一份，dog的name没有变说明外面的dog变量没有被改变。
+
+#### 指针类型接收者
 
 将Pet接口改为指针接收者
 
@@ -918,4 +927,42 @@ func main() {
 
 ```
 
-### 
+## flag
+
+可以用flag包对命令行参数进行解析
+
+```go
+package main
+
+import (
+	"flag"
+	"fmt"
+)
+
+// os.Args[0] is the path to the executable.
+// os.Args[1] is the first argument to the program.
+// os.Args[2] is the second argument to the program.
+// ...
+// os.Args[n] is the nth argument to the program.
+
+// go build -o test flag/main.go
+// ./test -u root -p root -h localhost -port 3306
+func main() {
+	var user string
+	var pwd string
+	var host string
+	var port int
+
+	flag.StringVar(&user, "u", "", "用户名 默认为空")
+	flag.StringVar(&pwd, "p", "", "密码 默认为空")
+	flag.StringVar(&host, "h", "localhost", "主机名 默认为localhost")
+	flag.IntVar(&port, "port", 3306, "端口 默认为3306")
+
+	flag.Parse()
+
+	fmt.Printf("user=%v pwd=%v host=%v port=%v\n", user, pwd, host, port)
+}
+```
+
+
+
