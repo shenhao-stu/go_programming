@@ -6,6 +6,7 @@ import (
 )
 
 type Person struct {
+	// tag的使用
 	Name     string `json:"name"`
 	Age      int    `json:"age"`
 	Birthday string
