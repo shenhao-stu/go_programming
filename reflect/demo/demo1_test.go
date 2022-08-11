@@ -59,6 +59,8 @@ func ReflectStruct(a interface{}) {
 	}
 
 	// 获取该结构体有多少个方法
+	// 如果传入的参数只是结构体的值传递，只计算接收者为结构体的方法
+	// 如果传入的参数是结构体的指针传递，同时计算接收者为结构体或者结构体指针的方法
 	numOfMethod := val.NumMethod()
 	fmt.Printf("struct has %d methods\n", numOfMethod)
 
@@ -78,6 +80,8 @@ func ReflectStruct(a interface{}) {
 	params2 = append(params2, reflect.ValueOf("marry"))
 	newVal := val.Method(2).Call(params2)[0]
 	fmt.Printf("newVal: %v\n", newVal)
+
+	//
 }
 func TestStruct(t *testing.T) {
 	// 创建了一个 Monster 实例
@@ -88,4 +92,9 @@ func TestStruct(t *testing.T) {
 	}
 	// 将 Monster 实例传递给 TestStruct 函数
 	ReflectStruct(a)
+	// 由于传入的参数是结构体的指针类型
+	rVal := reflect.ValueOf(&a)
+	// 如果结构体的接收者是指针类型，或者值类型，此时都会被计入Methods
+	fmt.Printf("rVal.NumMethod(): %v\n", rVal.NumMethod())
+
 }
