@@ -59,7 +59,7 @@ func ReflectStruct(a interface{}) {
 	}
 
 	// 获取该结构体有多少个方法
-	// 如果传入的参数只是结构体的值传递，只计算接收者为结构体的方法
+	// 如果传入的参数只是结构体的值传递，只计算接收者为结构体的方法，虽然结构体也能调用结构体指针的方法，但其实是通过隐式转换($obj).Set
 	// 如果传入的参数是结构体的指针传递，同时计算接收者为结构体或者结构体指针的方法
 	numOfMethod := val.NumMethod()
 	fmt.Printf("struct has %d methods\n", numOfMethod)
@@ -93,6 +93,7 @@ func TestStruct(t *testing.T) {
 	ReflectStruct(a)
 	// 由于传入的参数是结构体的指针类型
 	rVal := reflect.ValueOf(&a)
+	// 虽然结构体也能调用指针接收者类型的方法，但其实是通过隐式转换($obj).Set实现的
 	// 如果结构体的接收者是指针类型，或者值类型，此时都会被计入Methods
 	fmt.Printf("rVal.NumMethod(): %v\n", rVal.NumMethod())
 
