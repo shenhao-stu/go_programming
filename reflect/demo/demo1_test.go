@@ -81,7 +81,6 @@ func ReflectStruct(a interface{}) {
 	newVal := val.Method(2).Call(params2)[0]
 	fmt.Printf("newVal: %v\n", newVal)
 
-	//
 }
 func TestStruct(t *testing.T) {
 	// 创建了一个 Monster 实例
