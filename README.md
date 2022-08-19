@@ -1025,3 +1025,25 @@ func main(){
 
 
 ```
+
+### error
+
+`implicit assignment of unexported field`
+
+在golang中，如果**结构体的内部变量在别的包调用**，会出现类似“implicit assignment of unexported field”的问题。
+
+- 因为，在golang中，软件结构是以包为单位的，在同一个包内属于内部，不同包之间属于包间。
+- **给外部包用的变量，必须首字母大写**，否则就会出现上述问题。
+- 同时，结构体内部的变量，如果不声明为首字母大写的变量，在外部包调用也会出现该问题。
+
+`composite literal uses unkeyed fields`
+
+golang**结构体偷懒初始化**
+
+```go
+user.Person{"value", "value"} ×
+user.Person{key: "value", key: "value"} √
+```
+
+虽然这只是一个警告，但是之后如果在结构体中添加了一个字段，那么使用unkeyed初始化的所有东西都会被破坏。显然，在一个项目中不希望遇到这种错误。
+
