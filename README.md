@@ -989,4 +989,39 @@ func PathExists(path string) (bool, error) {
 }
 ```
 
+## 补充
+
+字段和方法小写时，即使使用了匿名继承，也无法跨包访问。
+
+```go
+// main.go
+package main
+
+import (
+    "fmt"
+    "project/user"
+)
+
+type China Struct{
+    CreditId int
+}
+
+type Stu struct{
+    Name string
+    user.Person
+    China
+}
+
+func main(){
+    stu := Stu{
+        Name: "tom",
+        Person: user.Person{
+            age: 18,
+        },
+    }
+    stu.China = China{0}
+    fmt.Println(stu)
+}
+
+
 ```
