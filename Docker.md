@@ -153,7 +153,7 @@ appendonly yes
 #### 配置映射并启动
 
 ```bash
-docker run --name redis -p 6379:6379 -v /root/docker/redis/data:/data -v /root/docker/redis/conf/redis.conf:/etc/redis/redis.conf --privileged=true -d redis redis-server /etc/redis/redis.conf --requirepass "gitmodelAbcde" --loglevel warning
+docker run --name redis -p 6379:6379 -v /root/docker/redis/data:/data -v /root/docker/redis/conf/redis.conf:/etc/redis/redis.conf --privileged=true -d redis redis-server /etc/redis/redis.conf --requirepass "password" --loglevel warning
 ```
 
 - **--name:**指定容器的名字
